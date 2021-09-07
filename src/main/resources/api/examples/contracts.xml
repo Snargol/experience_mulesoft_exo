@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<total>
+  <data>
+    <amountByMonth amountTotal="46300" months="12.17">3805.479452054795</amountByMonth>
+    <id contracts="2">10</id>
+  </data>
+  <data>
+    <amountByMonth amountTotal="20250" months="12.17">1664.3835616438357</amountByMonth>
+    <id contracts="1">-2</id>
+  </data>
+  <data>
+    <amountByMonth amountTotal="18250" months="12.17">1500</amountByMonth>
+    <id contracts="1">0</id>
+  </data>
+  <data>
+    <amountByMonth amountTotal="19900" months="12.17">1635.6164383561645</amountByMonth>
+    <id contracts="1">2</id>
+  </data>
+  <data>
+    <amountByMonth amountTotal="83250" months="12.17">6842.465753424658</amountByMonth>
+    <id contracts="2">118</id>
+  </data>
+  <data>
+    <amountByMonth amountTotal="43250" months="12.17">3554.7945205479455</amountByMonth>
+    <id contracts="1">122</id>
+  </data>
+</total>

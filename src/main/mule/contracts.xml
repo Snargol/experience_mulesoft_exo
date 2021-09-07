@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="fetch-data" doc:id="d9d1f887-b0f2-4866-8942-ec96220f8889" >
+		<set-variable value="#[payload.param default 'pair']" doc:name="Set Variable" doc:id="ccc93adf-f4cc-438f-b7ef-ffe0185f7460" variableName="pairImpair"/>
+		<choice doc:name="Choice" doc:id="98d5dfa9-ac72-4a7f-a010-f93566b6c1ad" >
+			<when expression="#[vars.pairImpair == 'pair']">
+				<http:request method="GET" doc:name="Request" doc:id="fde36130-5ab6-4c8b-bc81-02fc0cd45591" config-ref="HTTP_Request_configuration" path="processed-contracts?isPair=true"/>
+			</when>
+			<otherwise >
+				<http:request method="GET" doc:name="Request" doc:id="8833f619-2397-410c-ab6c-5f8a0b1aec74" config-ref="HTTP_Request_configuration" path="processed-contracts?isPair=false"/>
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="Transform Message" doc:id="0f5dc2c8-c061-4cf3-b257-ffa67864c176" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	contracts: payload.total.*data map ({
+		data: $,
+		amountTotal: $.amountByMonth.@amountTotal,
+		number_of_contracts: $.id.@contracts,
+		number_of_months: $.amountByMonth.@months,
+	})
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="215f1c49-39fe-4de0-8988-939f00bc20e4" name="reformat-data"/>
+	</flow>
+	<flow name="reformat-data" doc:id="6c4dbc89-1ea3-48b8-b9e1-1eb271d93221" >
+		<ee:transform doc:name="Transform Message" doc:id="a4765b84-0ec2-4108-8d13-a3e8cfe43c7f">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+((payload.contracts default []) as Array) map(value, index) -> {
+	"Contract_ID": value.data.id default "",
+    "Creation_Date": value.data.dateStart default "",
+    "Start_Date": value.data.dateStart default "",
+    "End_Date": value.data.dateEnd default "",
+    "Customer_ID": value.data.customer_id default "",
+    "Salesman_ID": value.data.salesman_id default "",
+    "SalesUnit_ID": value.data.salesman_Unit default "",
+    "Amount": value.amountTotal default 0,
+    "Contract_Name": value.data.contract_Name default "",
+    "Currency_Code": value.data.currency_Code default "",
+    "Renew": value.data.renew default "",
+    "Customer_Name": value.data.customer_Name default "",
+    "Salesman_Name": value.data.salesman_Name default "",
+    "SalesUnit_Name": value.data.salesUnit_Name default "",
+    "Number_Of_Months": value.number_of_months default 0,
+    "Number_Of_Contracts": value.number_of_contracts default 1,
+    "Opportunity_ID": value.data.opportunity_id default "",
+    "CUTOFF_MONTH": value.data.cutoff_month default "",
+    "CUTOFF_AMOUNT": value.data.cutoff_amount default "",
+    "amount_per_month" : value.data.amountByMonth default 0,
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
